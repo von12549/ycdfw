@@ -9,6 +9,7 @@ namespace dfw.Models
     {
         public static void DisplayBoard(Board board, List<Player> players)
         {
+            //原棋盘
             //foreach (var po in board.BoardMap)
             //{
             //    try
@@ -22,10 +23,12 @@ namespace dfw.Models
             //        throw;
             //    }
             //}
+
+            //全局棋盘
             #region Display 18-29
             for (int i = 18; i <= 29; i++)
             {
-                Console.Write("############\t");
+                Console.Write("|------------\t|");
             }
             Console.WriteLine();
             for (int i = 18; i <= 29; i++)
@@ -37,11 +40,11 @@ namespace dfw.Models
             {
                 if(board.BoardMap[i].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"签约 :  {board.BoardMap[i].PositionCard.InitCost}\t");
+                    Console.Write($"|签约 :  {board.BoardMap[i].PositionCard.InitCost}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
@@ -49,11 +52,11 @@ namespace dfw.Models
             {
                 if (board.BoardMap[i].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"升级 :  {board.BoardMap[i].PositionCard.LevelUpCost}\t");
+                    Console.Write($"|升级 :  {board.BoardMap[i].PositionCard.LevelUpCost}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
@@ -61,11 +64,11 @@ namespace dfw.Models
             {
                 if (board.BoardMap[i].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"等级 :  {board.BoardMap[i].PositionCard.Level}\t");
+                    Console.Write($"|等级 :  {board.BoardMap[i].PositionCard.Level}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
@@ -73,11 +76,11 @@ namespace dfw.Models
             {
                 if (board.BoardMap[i].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"通告 :  {board.BoardMap[i].PositionCard.Fee[board.BoardMap[i].PositionCard.Level]}\t");
+                    Console.Write($"|通告 :  {board.BoardMap[i].PositionCard.Fee[board.BoardMap[i].PositionCard.Level]}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
@@ -85,11 +88,11 @@ namespace dfw.Models
             {
                 if (board.BoardMap[i].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"抵押 :  {board.BoardMap[i].PositionCard.isMortgage}\t");
+                    Console.Write($"|抵押 :  {board.BoardMap[i].PositionCard.isMortgage}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
@@ -99,23 +102,23 @@ namespace dfw.Models
                 {
                     if (board.BoardMap[i].PositionCard.HolderId == "-1")
                     {
-                        Console.Write($"所属 :  无\t");
+                        Console.Write($"|所属 :  无\t|");
                     }
                     else
                     {
-                        Console.Write($"所属 :  {board.BoardMap[i].PositionCard.HolderId}\t");
+                        Console.Write($"|所属 :  {board.BoardMap[i].PositionCard.HolderId}\t|");
                     }
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
             for (int i = 18; i <= 29; i++)
             {
                 var pl = players.Where(p => p.PositionNumber == i).ToList();
-                string str = "玩家:";
+                string str = "|玩家:";
                 foreach(var p in pl)
                 {
                     str += $"{p.Id} ";
@@ -124,7 +127,7 @@ namespace dfw.Models
                 {
                     str += " ";
                 }
-                Console.Write($"{str}\t");
+                Console.Write($"{str}\t|");
             }
             Console.WriteLine();
             #endregion
@@ -135,108 +138,115 @@ namespace dfw.Models
             {
                 a = 17 - x;
                 b = 30 + x;
-                Console.Write("############\t");
-                for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
-                Console.Write("############\t");
-                Console.WriteLine();
-
-                Console.Write($"{a} : {board.BoardMap[a].PositionCard.Name}\t");
-                for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
-                Console.Write($"{b} : {board.BoardMap[b].PositionCard.Name}\t");
-                Console.WriteLine();
-
-                if (board.BoardMap[a].PositionCard.Type == CardType.Idol)
+                Console.Write("|------------\t|");
+                if (x == 0)
                 {
-                    Console.Write($"签约 :  {board.BoardMap[a].PositionCard.InitCost}\t");
+                    for (int i = 0; i < 10; i++) { Console.Write("------------\t"); }
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
                 }
+                Console.Write("|------------\t|");
+                Console.WriteLine();
+
+                Console.Write($"|{a} : {board.BoardMap[a].PositionCard.Name}\t|");
                 for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
-                if (board.BoardMap[b].PositionCard.Type == CardType.Idol)
-                {
-                    Console.Write($"签约 :  {board.BoardMap[b].PositionCard.InitCost}\t");
-                }
-                else
-                {
-                    Console.Write("............\t");
-                }
+                Console.Write($"|{b} : {board.BoardMap[b].PositionCard.Name}\t|");
                 Console.WriteLine();
 
                 if (board.BoardMap[a].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"升级 :  {board.BoardMap[a].PositionCard.LevelUpCost}\t");
+                    Console.Write($"|签约 :  {board.BoardMap[a].PositionCard.InitCost}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
                 for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
                 if (board.BoardMap[b].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"升级 :  {board.BoardMap[b].PositionCard.LevelUpCost}\t");
+                    Console.Write($"|签约 :  {board.BoardMap[b].PositionCard.InitCost}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
                 Console.WriteLine();
 
                 if (board.BoardMap[a].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"等级 :  {board.BoardMap[a].PositionCard.Level}\t");
+                    Console.Write($"|升级 :  {board.BoardMap[a].PositionCard.LevelUpCost}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
                 for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
                 if (board.BoardMap[b].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"等级 :  {board.BoardMap[b].PositionCard.Level}\t");
+                    Console.Write($"|升级 :  {board.BoardMap[b].PositionCard.LevelUpCost}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
                 Console.WriteLine();
 
                 if (board.BoardMap[a].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"通告 :  {board.BoardMap[a].PositionCard.Fee[board.BoardMap[17].PositionCard.Level]}\t");
+                    Console.Write($"|等级 :  {board.BoardMap[a].PositionCard.Level}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
                 for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
                 if (board.BoardMap[b].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"通告 :  {board.BoardMap[b].PositionCard.Fee[board.BoardMap[30].PositionCard.Level]}\t");
+                    Console.Write($"|等级 :  {board.BoardMap[b].PositionCard.Level}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
                 Console.WriteLine();
 
                 if (board.BoardMap[a].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"抵押 :  {board.BoardMap[a].PositionCard.isMortgage}\t");
+                    Console.Write($"|通告 :  {board.BoardMap[a].PositionCard.Fee[board.BoardMap[17].PositionCard.Level]}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
                 for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
                 if (board.BoardMap[b].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"抵押 :  {board.BoardMap[b].PositionCard.isMortgage}\t");
+                    Console.Write($"|通告 :  {board.BoardMap[b].PositionCard.Fee[board.BoardMap[30].PositionCard.Level]}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
+                }
+                Console.WriteLine();
+
+                if (board.BoardMap[a].PositionCard.Type == CardType.Idol)
+                {
+                    Console.Write($"|抵押 :  {board.BoardMap[a].PositionCard.isMortgage}\t|");
+                }
+                else
+                {
+                    Console.Write("|............\t|");
+                }
+                for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
+                if (board.BoardMap[b].PositionCard.Type == CardType.Idol)
+                {
+                    Console.Write($"|抵押 :  {board.BoardMap[b].PositionCard.isMortgage}\t|");
+                }
+                else
+                {
+                    Console.Write("|............\t|");
                 }
                 Console.WriteLine();
 
@@ -244,38 +254,38 @@ namespace dfw.Models
                 {
                     if (board.BoardMap[a].PositionCard.HolderId == "-1")
                     {
-                        Console.Write($"所属 :  无\t");
+                        Console.Write($"|所属 :  无\t|");
                     }
                     else
                     {
-                        Console.Write($"所属 :  {board.BoardMap[a].PositionCard.HolderId}\t");
+                        Console.Write($"|所属 :  {board.BoardMap[a].PositionCard.HolderId}\t|");
                     }
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
                 for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
                 if (board.BoardMap[b].PositionCard.Type == CardType.Idol || board.BoardMap[b].PositionCard.Type == CardType.Special)
                 {
                     if (board.BoardMap[b].PositionCard.HolderId == "-1")
                     {
-                        Console.Write($"所属 :  无\t");
+                        Console.Write($"|所属 :  无\t|");
                     }
                     else
                     {
-                        Console.Write($"所属 :  {board.BoardMap[b].PositionCard.HolderId}\t");
+                        Console.Write($"|所属 :  {board.BoardMap[b].PositionCard.HolderId}\t|");
                     }
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
                 Console.WriteLine();
 
 
                 var pl1 = players.Where(p => p.PositionNumber == a).ToList();
-                string str1 = "玩家:";
+                string str1 = "|玩家:";
                 foreach (var p in pl1)
                 {
                     str1 += $"{p.Id} ";
@@ -284,10 +294,10 @@ namespace dfw.Models
                 {
                     str1 += " ";
                 }
-                Console.Write($"{str1}\t");
+                Console.Write($"{str1}\t|");
                 for (int i = 0; i < 10; i++) { Console.Write("            \t"); }
                 var pl2 = players.Where(p => p.PositionNumber == b).ToList();
-                string str2 = "玩家:";
+                string str2 = "|玩家:";
                 foreach (var p in pl2)
                 {
                     str2 += $"{p.Id} ";
@@ -296,43 +306,31 @@ namespace dfw.Models
                 {
                     str2 += " ";
                 }
-                Console.Write($"{str2}\t");
+                Console.Write($"{str2}\t|");
                 Console.WriteLine();
             }
             #endregion
             #region 11 - 0
             for (int i = 11; i >= 0; i--)
             {
-                Console.Write("############\t");
+                Console.Write("|------------\t|");
             }
             Console.WriteLine();
 
             for (int i = 11; i >=0; i--)
             {
-                Console.Write($"{i} : {board.BoardMap[i].PositionCard.Name}\t");
+                Console.Write($"|{i} : {board.BoardMap[i].PositionCard.Name}\t|");
             }
             Console.WriteLine();
             for (int i = 11; i >= 0; i--)
             {
                 if (board.BoardMap[i].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"签约 :  {board.BoardMap[i].PositionCard.InitCost}\t");
+                    Console.Write($"|签约 :  {board.BoardMap[i].PositionCard.InitCost}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
-                }
-            }
-            Console.WriteLine();
-            for (int i = 11; i >= 0; i--)
-            {
-                if (board.BoardMap[i].PositionCard.Type == CardType.Idol)
-                {
-                    Console.Write($"升级 :  {board.BoardMap[i].PositionCard.LevelUpCost}\t");
-                }
-                else
-                {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
@@ -340,11 +338,11 @@ namespace dfw.Models
             {
                 if (board.BoardMap[i].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"等级 :  {board.BoardMap[i].PositionCard.Level}\t");
+                    Console.Write($"|升级 :  {board.BoardMap[i].PositionCard.LevelUpCost}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
@@ -352,11 +350,23 @@ namespace dfw.Models
             {
                 if (board.BoardMap[i].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"通告 :  {board.BoardMap[i].PositionCard.Fee[board.BoardMap[i].PositionCard.Level]}\t");
+                    Console.Write($"|等级 :  {board.BoardMap[i].PositionCard.Level}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
+                }
+            }
+            Console.WriteLine();
+            for (int i = 11; i >= 0; i--)
+            {
+                if (board.BoardMap[i].PositionCard.Type == CardType.Idol)
+                {
+                    Console.Write($"|通告 :  {board.BoardMap[i].PositionCard.Fee[board.BoardMap[i].PositionCard.Level]}\t|");
+                }
+                else
+                {
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
@@ -366,11 +376,11 @@ namespace dfw.Models
             {
                 if (board.BoardMap[i].PositionCard.Type == CardType.Idol)
                 {
-                    Console.Write($"抵押 :  {board.BoardMap[i].PositionCard.isMortgage}\t");
+                    Console.Write($"|抵押 :  {board.BoardMap[i].PositionCard.isMortgage}\t|");
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
@@ -380,23 +390,23 @@ namespace dfw.Models
                 {
                     if (board.BoardMap[i].PositionCard.HolderId == "-1")
                     {
-                        Console.Write($"所属 :  无\t");
+                        Console.Write($"|所属 :  无\t|");
                     }
                     else
                     {
-                        Console.Write($"所属 :  {board.BoardMap[i].PositionCard.HolderId}\t");
+                        Console.Write($"|所属 :  {board.BoardMap[i].PositionCard.HolderId}\t|");
                     }
                 }
                 else
                 {
-                    Console.Write("............\t");
+                    Console.Write("|............\t|");
                 }
             }
             Console.WriteLine();
             for (int i = 11; i >= 0; i--)
             {
                 var pl = players.Where(p => p.PositionNumber == i).ToList();
-                string str = "玩家:";
+                string str = "|玩家:";
                 foreach (var p in pl)
                 {
                     str += $"{p.Id} ";
@@ -405,9 +415,13 @@ namespace dfw.Models
                 {
                     str += " ";
                 }
-                Console.Write($"{str}\t");
+                Console.Write($"{str}\t|");
             }
             Console.WriteLine();
+            for (int i = 11; i >= 0; i--)
+            {
+                Console.Write($"|------------\t|");
+            }
             #endregion
 
 
@@ -416,22 +430,22 @@ namespace dfw.Models
 
         public static void DisplayCard(Card card)
         {
-            Console.WriteLine($"Name : {card.Name}");
-            Console.WriteLine($"Info : {card.Info}");
+            Console.Write($"| Name : {card.Name} | ");
+            Console.Write($"Info : {card.Info} | ");
             if (card.Type == CardType.Idol)
             {
-                Console.WriteLine($"签约费  ：{card.InitCost}");
-                Console.WriteLine($"升级费  ：{card.LevelUpCost}");
-                Console.WriteLine($"等级    ：{card.Level}");
-                Console.WriteLine($"通告费  ：{card.Fee[card.Level]}");
-                Console.WriteLine($"是否抵押：{card.isMortgage}");
+                Console.Write($"签约费 ：{card.InitCost} | ");
+                Console.Write($"升级费 ：{card.LevelUpCost} | ");
+                Console.Write($"等级 ：{card.Level} | ");
+                Console.Write($"通告费 ：{card.Fee[card.Level]} | ");
+                Console.Write($"是否抵押 ：{card.isMortgage} |");
                 if (!string.Equals(card.HolderId, "-1"))
                 {
-                    Console.WriteLine($"持有者    ：{card.HolderId}");
+                    Console.WriteLine($"持有者 ：{card.HolderId} |");
                 }
                 else
                 {
-                    Console.WriteLine($"持有者    ：无");
+                    Console.WriteLine($"持有者 ：无 |");
                 }
             }
         }
@@ -517,8 +531,10 @@ namespace dfw.Models
             Console.WriteLine("---------游戏菜单-----------");
             Console.WriteLine("1. 玩家行动：");
             Console.WriteLine("2. 玩家使用机会卡：");
-            Console.WriteLine("3. 显示卡池信息：");
-            Console.WriteLine("4. 显示玩家信息：");
+            Console.WriteLine("3. 抵押艺人或资产：");
+            Console.WriteLine("4. 赎回艺人或资产：");
+            Console.WriteLine("5. 显示卡池信息：");
+            Console.WriteLine("6. 显示玩家信息：");
             Console.WriteLine("0. 退出游戏菜单：");
             Console.WriteLine("---------等待输入-----------");
             Console.WriteLine();
@@ -559,10 +575,14 @@ namespace dfw.Models
                     Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 获得初始点奖励 {log.GoldWin}");
                     break;
                 case LogEventType.GoldChange:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 进行支付结算，收入:${log.GoldWin}，支出:${log.GoldLoss}");
-                    break;
-                case LogEventType.CPFee:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 进行CP支付结算，收入:${log.GoldWin}，支出:${log.GoldLoss}");
+                    if (log.CpLoss == 0)
+                    {
+                        Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 回合支付结算，{log.PayFrom} 向 {log.PayTo} 支付 ${log.GoldLoss}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 回合支付结算，{log.PayFrom} 向 {log.PayTo} 支付 ${log.GoldLoss} + CP: ${log.CpLoss}");
+                    }
                     break;
                 case LogEventType.LevelUp:
                     Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 对艺人{log.LevelChangePositionNo}进行升级，lv{log.LevelUpFrom} - lv{log.LevelUpTo}，花费${log.CardEvent.LevelUpCost}");
@@ -601,7 +621,16 @@ namespace dfw.Models
                 case LogEventType.Holiday:
                     Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
                     break;
+                case LogEventType.HolidayEnd:
+                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
+                    break;
                 case LogEventType.Education:
+                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
+                    break;
+                case LogEventType.Mortgage:
+                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
+                    break;
+                case LogEventType.Redeem:
                     Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
                     break;
                 default:

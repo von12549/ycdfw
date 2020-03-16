@@ -32,22 +32,25 @@ namespace dfw.Models
 
             var player = currentPlayer;
             Console.WriteLine($"玩家 {player.Name} 回合: ");
-            int dice = -1;
-            while(dice > 6 || dice < 1)
-            {
-                Console.WriteLine("请输入玩家移动的距离：(1-6)");
-                ReadIntNumber(out dice);
-            }
-
-            if (player == null)
-            {
-                Console.WriteLine("玩家信息不存在，请重新输入：");
-                return false;
-            }
             if (player.Stop == true)
             {
                 return HolidayEnd(player);
             }
+            int dice = -1;
+            while(dice > 6 || dice < 1)
+            {
+                Console.WriteLine("请输入玩家移动的距离：(1-6)/(Exit 退出)");
+                bool notExit = ReadIntNumber(out dice);
+                if (!notExit)
+                    return false;
+            }
+
+            if (player == null)
+            {
+                Console.WriteLine("玩家信息不存在。");
+                return false;
+            }
+            
             GameLogs moveLog = new GameLogs()
             {
                 ID = GetLogID(),
@@ -77,16 +80,22 @@ namespace dfw.Models
                 if (!string.Equals(positionCard.HolderId, player.Id) && !string.Equals(positionCard.HolderId, "-1"))
                 {
                     var playerTo = Players.FirstOrDefault(p => p.Id == positionCard.HolderId);
-                    if (playerTo.CanWin == true)
+                    if (playerTo.CanWin == true && positionCard.isMortgage == false)
                     {
                         var fee = positionCard.Fee[positionCard.Level];
                         var cpFee = CPManager.CPCost(GameBoard, player.PositionNumber);
-                        GoldExchange(player, playerTo, fee);
-                        CPFee(player, playerTo, cpFee);
+                        GoldExchange(player, playerTo, fee, cpFee);
                     }
                     else
                     {
-                        Console.WriteLine($"玩家{playerTo.Name} 处于休息状态，无法获得收入。");
+                        if (playerTo.CanWin == false)
+                        {
+                            Console.WriteLine($"玩家{playerTo.Name} 处于休息状态，无法获得收入。");
+                        }
+                        if(positionCard.isMortgage == true)
+                        {
+                            Console.WriteLine($"艺人{player.PositionNumber}:{positionCard.Name} 处于抵押状态，无法获得收入。");
+                        }
                     }
                 }
                 else if (string.Equals(positionCard.HolderId, player.Id))
@@ -96,10 +105,14 @@ namespace dfw.Models
                         bool loop = true;
                         while (loop)
                         {
-                            Console.WriteLine("是否进行艺人升级？（Y/N）");
+                            Console.WriteLine("是否进行艺人升级？（Y/n）");
                             string YesOrNo = Console.ReadLine();
-                            switch (YesOrNo.ToUpper())
+                            switch (YesOrNo.Trim().ToUpper())
                             {
+                                case "":
+                                    IdolLevelUp(player);
+                                    loop = false;
+                                    break;
                                 case "Y":
                                     IdolLevelUp(player);
                                     loop = false;
@@ -120,15 +133,20 @@ namespace dfw.Models
                         }
                     }
                 }
-                else if(string.Equals(positionCard.HolderId, "-1"))
+                else if (string.Equals(positionCard.HolderId, "-1"))
                 {
                     bool loop = true;
                     while (loop)
                     {
-                        Console.WriteLine("该艺人没有所属公司，是否签约艺人？（Y/N）");
+                        Console.WriteLine("该艺人没有所属公司，是否签约艺人？（Y/n）");
                         string YesOrNo = Console.ReadLine();
-                        switch (YesOrNo.ToUpper())
+
+                        switch (YesOrNo.Trim().ToUpper())
                         {
+                            case "":
+                                IdolContract(player);
+                                loop = false;
+                                break;
                             case "Y":
                                 IdolContract(player);
                                 loop = false;
@@ -145,6 +163,8 @@ namespace dfw.Models
                                 Console.WriteLine("不进行签约。");
                                 loop = false;
                                 break;
+                            default:
+                                break;
                         }
                     }
                 }
@@ -154,7 +174,7 @@ namespace dfw.Models
                 if (!string.Equals(positionCard.HolderId, player.Id) && !string.Equals(positionCard.HolderId, "-1"))
                 {
                     var playerTo = Players.FirstOrDefault(p => p.Id == positionCard.HolderId);
-                    if (playerTo.CanWin == true)
+                    if (playerTo.CanWin == true && positionCard.isMortgage == false)
                     {
                         int fee = 0;
                         var specialHolds = GameBoard.BoardMap.Where(x => x.PositionCard.Type == CardType.Special && x.PositionCard.HolderId == positionCard.HolderId).ToList();
@@ -175,11 +195,53 @@ namespace dfw.Models
                             default:
                                 break;
                         }
-                        GoldExchange(player, playerTo, fee);
+                        GoldExchange(player, playerTo, fee, 0);
                     }
                     else
                     {
-                        Console.WriteLine($"玩家{playerTo.Name} 处于休息状态，无法获得收入。");
+                        if (playerTo.CanWin == false)
+                        {
+                            Console.WriteLine($"玩家{playerTo.Name} 处于休息状态，无法获得收入。");
+                        }
+                        if (positionCard.isMortgage == true)
+                        {
+                            Console.WriteLine($"艺人{player.PositionNumber}:{positionCard.Name} 处于抵押状态，无法获得收入。");
+                        }
+                    }
+                }
+                else if (string.Equals(positionCard.HolderId, "-1"))
+                {
+                    bool loop = true;
+                    while (loop)
+                    {
+                        Console.WriteLine("该产业没有所属公司，是否买下产业？（Y/n）");
+                        string YesOrNo = Console.ReadLine();
+
+                        switch (YesOrNo.Trim().ToUpper())
+                        {
+                            case "":
+                                IdolContract(player);
+                                loop = false;
+                                break;
+                            case "Y":
+                                IdolContract(player);
+                                loop = false;
+                                break;
+                            case "YES":
+                                IdolContract(player);
+                                loop = false;
+                                break;
+                            case "N":
+                                Console.WriteLine("不进行签约。");
+                                loop = false;
+                                break;
+                            case "NO":
+                                Console.WriteLine("不进行签约。");
+                                loop = false;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
@@ -247,12 +309,14 @@ namespace dfw.Models
             {
                 while (true)
                 {
-                    Console.WriteLine("请输入使用机会卡的玩家ID：");
-                    string playerId = Console.ReadLine();
+                    Console.WriteLine("请输入使用机会卡的玩家ID：(Exit 退出)");
+                    string playerId = Console.ReadLine().Trim();
+                    if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                        return false;
                     player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
                     if (player == null)
                     {
-                        Console.WriteLine("该玩家不存在，请重新输入：");
+                        Console.WriteLine("该玩家不存在。");
                         continue;
                     }
                     break;
@@ -307,12 +371,14 @@ namespace dfw.Models
             {
                 while (true)
                 {
-                    Console.WriteLine("请输入使用机会卡的玩家ID：");
-                    string playerId = Console.ReadLine();
+                    Console.WriteLine("请输入使用机会卡的玩家ID：(Exit 退出)");
+                    string playerId = Console.ReadLine().Trim();
+                    if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                        return false;
                     player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
                     if (player == null)
                     {
-                        Console.WriteLine("该玩家不存在，请重新输入：");
+                        Console.WriteLine("该玩家不存在。");
                         continue;
                     }
                     break;
@@ -363,7 +429,7 @@ namespace dfw.Models
             return true;
         }
 
-        private bool GoldExchange(Player playerFrom, Player playerTo, int gold)
+        private bool GoldExchange(Player playerFrom, Player playerTo, int gold, int cp)
         {
             GameLogs payLog = new GameLogs()
             {
@@ -372,61 +438,20 @@ namespace dfw.Models
                 PlayerName = playerFrom.Name,
                 GoldWin = 0,
                 GoldLoss = gold,
+                CpWin = 0,
+                CpLoss = cp,
                 Info = "支付金币",
                 Round = Round,
-                currentPlayer = currentPlayer
+                currentPlayer = currentPlayer,
+                PayFrom = playerFrom.Name,
+                PayTo = playerTo.Name
             };
             AddLog(payLog);
 
-            GameLogs recieveLog = new GameLogs()
-            {
-                ID = GetLogID(),
-                Type = LogEventType.GoldChange,
-                PlayerName = playerTo.Name,
-                GoldWin = gold,
-                GoldLoss = 0,
-                Info = "收获金币",
-                Round = Round,
-                currentPlayer = currentPlayer
-            };
-            AddLog(recieveLog);
-
             playerFrom.Gold -= gold;
+            playerFrom.Gold -= cp;
             playerTo.Gold += gold;
-
-            return true;
-        }
-
-        private bool CPFee(Player playerFrom, Player playerTo, int gold)
-        {
-            GameLogs payLog = new GameLogs()
-            {
-                ID = GetLogID(),
-                Type = LogEventType.CPFee,
-                PlayerName = playerFrom.Name,
-                GoldWin = 0,
-                GoldLoss = gold,
-                Info = "支付CP费",
-                Round = Round,
-                currentPlayer = currentPlayer
-            };
-            AddLog(payLog);
-
-            GameLogs recieveLog = new GameLogs()
-            {
-                ID = GetLogID(),
-                Type = LogEventType.CPFee,
-                PlayerName = playerTo.Name,
-                GoldWin = gold,
-                GoldLoss = 0,
-                Info = "支付CP费",
-                Round = Round,
-                currentPlayer = currentPlayer
-            };
-            AddLog(recieveLog);
-
-            playerFrom.Gold -= gold;
-            playerTo.Gold += gold;
+            playerTo.Gold += cp;
 
             return true;
         }
@@ -441,12 +466,14 @@ namespace dfw.Models
             {
                 while (true)
                 {
-                    Console.WriteLine("请输入使用机会卡的玩家ID：");
-                    string playerId = Console.ReadLine();
+                    Console.WriteLine("请输入使用机会卡的玩家ID：(Exit 退出)");
+                    string playerId = Console.ReadLine().Trim();
+                    if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                        return false;
                     player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
                     if (player == null)
                     {
-                        Console.WriteLine("该玩家不存在，请重新输入：");
+                        Console.WriteLine("该玩家不存在。");
                         continue;
                     }
                     break;
@@ -484,12 +511,14 @@ namespace dfw.Models
             Player player = new Player();
             while (true)
             {
-                Console.WriteLine("请输入使用机会卡的玩家ID：");
-                string playerId = Console.ReadLine();
+                Console.WriteLine("请输入使用机会卡的玩家ID：(Exit 退出)");
+                string playerId = Console.ReadLine().Trim();
+                if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                    return false;
                 player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
                 if(player == null)
                 {
-                    Console.WriteLine("该玩家不存在，请重新输入：");
+                    Console.WriteLine("该玩家不存在。");
                     continue;
                 }
                 break;
@@ -497,10 +526,25 @@ namespace dfw.Models
             int cardNumber = -1;
             while (true)
             {
-                Console.WriteLine("请输入机会卡ID：");
-                ReadIntNumber(out cardNumber);
+                Console.WriteLine($"玩家持有机会卡 {player.ChanceCards.Count} 张");
+                foreach(var c in player.ChanceCards)
+                {
+                    Console.Write($"{c} ");
+                }
+                Console.WriteLine();
+                if(player.ChanceCards.Count == 0)
+                {
+                    Console.WriteLine("无法使用机会卡。");
+                    break;
+                }
+
+                Console.WriteLine("请输入机会卡ID：(Exit 退出)");
+                bool notExit = ReadIntNumber(out cardNumber);
+                if (!notExit)
+                    return false;
                 if (player.ChanceCards.Contains(cardNumber))
                     break;
+                Console.WriteLine("玩家不持有该卡。");
                 
             }
 
@@ -538,12 +582,14 @@ namespace dfw.Models
             {
                 while (true)
                 {
-                    Console.WriteLine("请输入使用机会卡的玩家ID：");
-                    string playerId = Console.ReadLine();
+                    Console.WriteLine("请输入使用机会卡的玩家ID：(Exit 退出)");
+                    string playerId = Console.ReadLine().Trim();
+                    if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                        return false;
                     player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
                     if (player == null)
                     {
-                        Console.WriteLine("该玩家不存在，请重新输入：");
+                        Console.WriteLine("该玩家不存在。");
                         continue;
                     }
                     break;
@@ -623,6 +669,8 @@ namespace dfw.Models
             AddLog(holidayLog);
             player.Stop = false;
             player.CanWin = true;
+            PlayerMoved++;
+            Round = PlayerMoved / Players.Count;
             return true;
         }
 
@@ -632,12 +680,14 @@ namespace dfw.Models
             Player player;
             while (true)
             {
-                Console.WriteLine("请输入使用机会卡的玩家ID：");
-                string playerId = Console.ReadLine();
+                Console.WriteLine("请输入使用机会卡的玩家ID：(Exit 退出)");
+                string playerId = Console.ReadLine().Trim();
+                if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                    return false;
                 player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
                 if (player == null)
                 {
-                    Console.WriteLine("该玩家不存在，请重新输入：");
+                    Console.WriteLine("该玩家不存在。");
                     continue;
                 }
                 break;
@@ -664,12 +714,14 @@ namespace dfw.Models
             Player player;
             while (true)
             {
-                Console.WriteLine("请输入使用机会卡的玩家ID：");
-                string playerId = Console.ReadLine();
+                Console.WriteLine("请输入使用机会卡的玩家ID：(Exit 退出)");
+                string playerId = Console.ReadLine().Trim();
+                if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                    return false;
                 player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
                 if (player == null)
                 {
-                    Console.WriteLine("该玩家不存在，请重新输入：");
+                    Console.WriteLine("该玩家不存在。");
                     continue;
                 }
                 break;
@@ -678,8 +730,10 @@ namespace dfw.Models
             int positionNumber = - 1;
             while(positionNumber < 0 || positionNumber > 35)
             {
-                Console.WriteLine("请输入玩家的正确位置：");
-                ReadIntNumber(out positionNumber);
+                Console.WriteLine("请输入玩家的正确位置：(0-35)/(Exit 退出)");
+                bool notExit = ReadIntNumber(out positionNumber);
+                if (!notExit)
+                    return false;
             }
             GameLogs positionFixLog = new GameLogs()
             {
@@ -703,12 +757,14 @@ namespace dfw.Models
             Player player;
             while (true)
             {
-                Console.WriteLine("请输入使用机会卡的玩家ID：");
-                string playerId = Console.ReadLine();
+                Console.WriteLine("请输入使用机会卡的玩家ID：(Exit 退出)");
+                string playerId = Console.ReadLine().Trim();
+                if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                    return false;
                 player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
                 if (player == null)
                 {
-                    Console.WriteLine("该玩家不存在，请重新输入：");
+                    Console.WriteLine("该玩家不存在。");
                     continue;
                 }
                 break;
@@ -717,9 +773,11 @@ namespace dfw.Models
             bool loop = true;
             while (loop)
             {
-                Console.WriteLine("请输入玩家的正确金币：");
-                ReadIntNumber(out gold);
-                Console.WriteLine($"请确认的金币数额：{gold} (Y/N)");
+                Console.WriteLine("请输入玩家的正确金币：(Exit 退出)");
+                bool notExit = ReadIntNumber(out gold);
+                if (!notExit)
+                    return false;
+                Console.WriteLine($"请确认的金币数额：{gold} (Y/n)");
                 string YesOrNo = Console.ReadLine();
                 switch (YesOrNo.ToUpper())
                 {
@@ -763,14 +821,18 @@ namespace dfw.Models
             int positionNumber = -1;
             while (positionNumber < 0 || positionNumber > 35)
             {
-                Console.WriteLine("请输入艺人所在的位置：");
-                ReadIntNumber(out positionNumber);
+                Console.WriteLine("请输入艺人所在的位置：(0-35)/(Exit 退出)");
+                bool notExit = ReadIntNumber(out positionNumber);
+                if (!notExit)
+                    return false;
             }
             int level = -1;
             while (level < 0 || level > 4)
             {
-                Console.WriteLine("请输入艺人的正确等级：");
-                ReadIntNumber(out level);
+                Console.WriteLine("请输入艺人的正确等级：(0-4)/(Exit 退出)");
+                bool notExit = ReadIntNumber(out level);
+                if (!notExit)
+                    return false;             
             }
 
             var idol = GameBoard.BoardMap[positionNumber].PositionCard;
@@ -796,12 +858,31 @@ namespace dfw.Models
         private bool IdolOwnerFix()
         {
 
-            Console.WriteLine("请输入艺人所在的位置：");
-            string input = Console.ReadLine();
-            int positionNumber;
-            Int32.TryParse(input, out positionNumber);
-            Console.WriteLine("请输入艺人的正确拥有者：");
-            string playerId = Console.ReadLine();
+            int positionNumber = -1;
+            while (positionNumber < 0 || positionNumber > 35)
+            {
+                Console.WriteLine("请输入艺人所在的位置：(0-35)/(Exit 退出)");
+                bool notExit = ReadIntNumber(out positionNumber);
+                if (!notExit)
+                    return false;
+            }
+
+            Player player;
+            while (true)
+            {
+                Console.WriteLine("请输入艺人的正确拥有者ID：(Exit 退出)");
+                string playerId = Console.ReadLine().Trim();
+                if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                    return false;
+                player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
+                if (player == null)
+                {
+                    Console.WriteLine("该玩家不存在。");
+                    continue;
+                }
+                break;
+            }
+
 
             var idol = GameBoard.BoardMap[positionNumber].PositionCard;
             if (idol.Type == CardType.Idol || idol.Type == CardType.Special)
@@ -811,13 +892,135 @@ namespace dfw.Models
                     ID = GetLogID(),
                     Type = LogEventType.IdolOwnerFix,
                     LevelChangePositionNo = positionNumber,
-                    Info = $"艺人归属修正{positionNumber} : from{idol.HolderId} to {playerId}",
+                    Info = $"艺人归属修正{positionNumber} : from{idol.HolderId} to {player.Id}",
                     Round = Round,
                     currentPlayer = currentPlayer
                 };
                 AddLog(positionFixLog);
-                idol.HolderId = playerId;
+                idol.HolderId = player.Id;
             }
+            return true;
+        }
+
+
+        private bool Mortgage()
+        {
+            Player player;
+            while (true)
+            {
+                Console.WriteLine("请输入执行抵押的玩家ID：(Exit 退出)");
+                string playerId = Console.ReadLine().Trim();
+                if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                    return false;
+                player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
+                if (player == null)
+                {
+                    Console.WriteLine("该玩家不存在。");
+                    continue;
+                }
+                break;
+            }
+
+            int positionNumber = -1;
+            while (positionNumber < 0 || positionNumber > 35)
+            {
+                Console.WriteLine("请输入抵押艺人位置：(0-35)/(Exit 退出)");
+                bool notExit = ReadIntNumber(out positionNumber);
+                if (!notExit)
+                    return false;
+            }
+            var Idol = GameBoard.BoardMap[positionNumber].PositionCard;
+            if (Idol.Type != CardType.Idol && Idol.Type != CardType.Special)
+            {
+                Console.WriteLine("非艺人或特殊产业，不能抵押。");
+                return false;
+            }
+            if (Idol.HolderId != player.Id)
+            {
+                Console.WriteLine("艺人或特殊产业非该玩家所属，不能抵押。");
+                return false;
+            }
+            if(Idol.Type == CardType.Idol && Idol.Level > 0)
+            {
+                Console.WriteLine("艺人非素人(lv0)，不能抵押。");
+                return false;
+            }
+
+            GameLogs mortLog = new GameLogs()
+            {
+                ID = GetLogID(),
+                Type = LogEventType.Mortgage,
+                PlayerName = player.Name,
+                CardEvent = Idol,
+                Info = $"玩家 {player.Name} 抵押 {positionNumber} : {Idol.Name}, 获得 ${Idol.InitCost/2}",
+                Round = Round,
+                currentPlayer = currentPlayer
+            };
+            AddLog(mortLog);
+            Idol.isMortgage = true;
+            player.Gold += Idol.InitCost / 2;
+
+            return true;
+        }
+
+
+        private bool Redeem()
+        {
+            Player player;
+            while (true)
+            {
+                Console.WriteLine("请输入执行赎回的玩家ID：(Exit 退出)");
+                string playerId = Console.ReadLine().Trim();
+                if (string.Equals(playerId, "exit", StringComparison.OrdinalIgnoreCase))
+                    return false;
+                player = Players.FirstOrDefault(p => p.Id == playerId || string.Equals(p.Name, playerId, StringComparison.OrdinalIgnoreCase));
+                if (player == null)
+                {
+                    Console.WriteLine("该玩家不存在。");
+                    continue;
+                }
+                break;
+            }
+
+            int positionNumber = -1;
+            while (positionNumber < 0 || positionNumber > 35)
+            {
+                Console.WriteLine("请输入赎回艺人位置：(0-35)/(Exit 退出)");
+                bool notExit = ReadIntNumber(out positionNumber);
+                if (!notExit)
+                    return false;
+            }
+            var Idol = GameBoard.BoardMap[positionNumber].PositionCard;
+            if (Idol.isMortgage == false)
+            {
+                Console.WriteLine("艺人或特殊产业非抵押状态，不能赎回。");
+                return false;
+            }
+            if (Idol.HolderId != player.Id)
+            {
+                Console.WriteLine("艺人或特殊产业非该玩家所属，不能赎回。");
+                return false;
+            }
+
+            if (Idol.InitCost > player.Gold)
+            {
+                Console.WriteLine("玩家金币不足，不能赎回。");
+                return false;
+            }
+            GameLogs mortLog = new GameLogs()
+            {
+                ID = GetLogID(),
+                Type = LogEventType.Redeem,
+                PlayerName = player.Name,
+                CardEvent = Idol,
+                Info = $"玩家 {player.Name} 赎回 {positionNumber} : {Idol.Name}, 支付 ${Idol.InitCost}",
+                Round = Round,
+                currentPlayer = currentPlayer
+            };
+            AddLog(mortLog);
+            Idol.isMortgage = false;
+            player.Gold -= Idol.InitCost;
+
             return true;
         }
         #endregion

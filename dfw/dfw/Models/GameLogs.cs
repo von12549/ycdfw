@@ -16,6 +16,8 @@ namespace dfw.Models
         public int EndPoint { get; set; }
         public int GoldWin { get; set; }
         public int GoldLoss { get; set; }
+        public int CpWin { get; set; }
+        public int CpLoss { get; set; }
         public int ChanceCardWin { get; set; }
         public int ChanceCardUse { get; set; }
         public int ChangeCardTrigger { get; set; }
@@ -25,6 +27,8 @@ namespace dfw.Models
         public string Info { get; set; }
         public Player currentPlayer { get; set; }
         public int MoveToPositon { get; set; }
+        public string PayFrom { get; set; }
+        public string PayTo { get; set; }
     }
 
     public enum LogEventType
@@ -35,10 +39,8 @@ namespace dfw.Models
         RoundReward,
 
         GoldChange,
-        CPFee,
 
         LevelUp,
-
         ChanceCardWin,
         ChanceCardUse,
         ChangeCardTrigger,
@@ -54,10 +56,9 @@ namespace dfw.Models
         BackHome,
         Holiday,
         Education,
-        HolidayEnd
+        HolidayEnd,
 
-
-
-
+        Mortgage,
+        Redeem
     }
 }

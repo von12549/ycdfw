@@ -14,23 +14,30 @@ namespace dfw.Models
             while (gameRun)
             {
                 Display.DisplayMainMenu();
-                int selected = -1;
-                ReadIntNumber(out selected);
+                string selected = Console.ReadLine().Trim();
+                while(selected == "")
+                {
+                    selected = Console.ReadLine().Trim();
+                }
+                if(string.Equals(selected, "exit", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
                 switch (selected)
                 {
-                    case 1:
+                    case "1":
                         Display.DisplayBoard(GameBoard, Players);
                         break;
-                    case 2:
+                    case "2":
                         AddPlayer();
                         break;
-                    case 3:
+                    case "3":
                         foreach (var player in Players)
                         {
                             Display.DisplayPlayer(player);
                         }
                         break;
-                    case 4:
+                    case "4":
                         if (Players.Count == 0)
                         {
                             Console.WriteLine("玩家总数为0，无法开始游戏！");
@@ -38,16 +45,16 @@ namespace dfw.Models
                         }
                         GameLoopSecond();
                         break;
-                    case 5:
+                    case "5":
                         foreach (var log in Logs)
                         {
                             Display.DisplayLog(log, GameBoard);
                         }
                         break;
-                    case 6:
+                    case "6":
                         GameLoopFix();
                         break;
-                    case 0:
+                    case "0":
                         gameRun = false;
                         break;
                     default:
@@ -74,30 +81,43 @@ namespace dfw.Models
                     currentPlayer = Players[PlayerMoved % Players.Count];
                 }
                 Display.DisplayGameMenu();
-                int selected = -1;
-                ReadIntNumber(out selected);
+                string selected = Console.ReadLine().Trim();
+                while (selected == "")
+                {
+                    selected = Console.ReadLine().Trim();
+                }
+                if (string.Equals(selected, "exit", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
                 switch (selected)
                 {
-                    case 1:
+                    case "1":
                         var moveResult = Move();
                         break;
-                    case 2:
+                    case "2":
                         var cardUse = ChanceCardUse();
                         break;
-                    case 3:
+                    case "3":
+                        var mortResult = Mortgage();
+                        break;
+                    case "4":
+                        var redeemResult = Redeem();
+                        break;
+                    case "5":
                         Display.DisplayCH2(ChanceDeck, ChanceUsed, ChangeDeck, ChangeUsed, Players);
                         break;
-                    case 4:
+                    case "6":
                         foreach (var player in Players)
                         {
                             Display.DisplayPlayer(player);
                         }
                         break;
-                    case 0:
+                    case "0":
                         gameRun = false;
                         break;
                     default:
-                        Console.WriteLine("请从菜单选项中输入：（0 - 4）");
+                        Console.WriteLine("请从菜单选项中输入：（0 - 6）");
                         break;
                 }
             }
@@ -111,26 +131,33 @@ namespace dfw.Models
             while (gameRun)
             {
                 Display.DisplayDataFixMenu();
-                int selected = -1;
-                ReadIntNumber(out selected);
+                string selected = Console.ReadLine().Trim();
+                while (selected == "")
+                {
+                    selected = Console.ReadLine().Trim();
+                }
+                if (string.Equals(selected, "exit", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
                 switch (selected)
                 {
-                    case 1:
+                    case "1":
                         var playerNameFixResult = PlayerNameFix();
                         break;
-                    case 2:
+                    case "2":
                         var playerPositionFixResult = PlayerPositionFix();
                         break;
-                    case 3:
+                    case "3":
                         var goldFixResult = GoldFix();
                         break;
-                    case 4:
+                    case "4":
                         var levelFixResult = LevelFix();
                         break;
-                    case 5:
+                    case "5":
                         var ownerFixResult = IdolOwnerFix();
                         break;
-                    case 0:
+                    case "0":
                         gameRun = false;
                         break;
                     default:

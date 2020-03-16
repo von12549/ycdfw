@@ -234,13 +234,26 @@ namespace dfw.Models
             number = -1;
             try
             {
-                string input = Console.ReadLine();
-                while(input.Trim().Length == 0)
+                bool result = false;
+                string input = Console.ReadLine().Trim();
+                while(input.Length == 0)
                 {
-                    input = Console.ReadLine();
+                    input = Console.ReadLine().Trim();
                 }
-                Int32.TryParse(input, out number);
-                return true;
+
+                if (string.Equals(input.Trim(), "exit", StringComparison.OrdinalIgnoreCase))
+                { return false; }
+
+                else if (string.Equals(input.Trim(), "quit", StringComparison.OrdinalIgnoreCase))
+                { return false; }
+                else if (string.Equals(input.Trim(), "bye", StringComparison.OrdinalIgnoreCase))
+                { return false; }
+                else
+                {
+                    result = NumberCheck(input);
+                }
+                Int32.TryParse(input.Trim(), out number);
+                return result;
             }
             catch (Exception)
             {
