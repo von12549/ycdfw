@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace dfw.Models
 {
@@ -34,7 +35,7 @@ namespace dfw.Models
                     case "3":
                         foreach (var player in Players)
                         {
-                            Display.DisplayPlayer(player);
+                            Display.DisplayPlayer(player, GameBoard);
                         }
                         break;
                     case "4":
@@ -49,6 +50,7 @@ namespace dfw.Models
                         foreach (var log in Logs)
                         {
                             Display.DisplayLog(log, GameBoard);
+                            Records.RecordLog(log, GameBoard);
                         }
                         break;
                     case "6":
@@ -72,14 +74,7 @@ namespace dfw.Models
             bool gameRun = true;
             while (gameRun)
             {
-                if (PlayerMoved == 0)
-                {
-                    currentPlayer = Players[0];
-                }
-                else
-                {
-                    currentPlayer = Players[PlayerMoved % Players.Count];
-                }
+                
                 Display.DisplayGameMenu();
                 string selected = Console.ReadLine().Trim();
                 while (selected == "")
@@ -96,21 +91,37 @@ namespace dfw.Models
                         var moveResult = Move();
                         break;
                     case "2":
-                        var cardUse = ChanceCardUse();
+                        bool autoRun = true;
+                        while (autoRun)
+                        {
+                            var autoMoveResult = Move(true, true);
+                            Thread.Sleep(50);
+                            foreach (var p in Players)
+                            {
+                                if (p.Gold < 0)
+                                {
+                                    autoRun = false;
+                                }
+                            }
+                        }
+                        EndGame();
                         break;
                     case "3":
-                        var mortResult = Mortgage();
+                        var cardUse = ChanceCardUse();
                         break;
                     case "4":
-                        var redeemResult = Redeem();
+                        var mortResult = Mortgage();
                         break;
                     case "5":
-                        Display.DisplayCH2(ChanceDeck, ChanceUsed, ChangeDeck, ChangeUsed, Players);
+                        var redeemResult = Redeem();
                         break;
                     case "6":
+                        Display.DisplayCH2(ChanceDeck, ChanceUsed, ChangeDeck, ChangeUsed, Players);
+                        break;
+                    case "7":
                         foreach (var player in Players)
                         {
-                            Display.DisplayPlayer(player);
+                            Display.DisplayPlayer(player, GameBoard);
                         }
                         break;
                     case "0":

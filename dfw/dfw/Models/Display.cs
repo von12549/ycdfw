@@ -490,7 +490,7 @@ namespace dfw.Models
             Console.WriteLine("----------------------------");
         }
 
-        public static void DisplayPlayer(Player player)
+        public static void DisplayPlayer(Player player, Board board)
         {
             Console.WriteLine();
             Console.WriteLine("----------玩家信息 ----------");
@@ -506,6 +506,13 @@ namespace dfw.Models
             foreach(var c in player.ChanceCards)
             {
                 Console.Write($"{c} ");
+            }
+            Console.WriteLine();
+            var CardHolds = board.BoardMap.Where(c => string.Equals(c.PositionCard.HolderId, player.Id)).ToList();
+            Console.WriteLine($"玩家签约数量： {CardHolds.Count}");
+            foreach(var c in CardHolds)
+            {
+                Console.Write($"{c.PositionNumber} ");
             }
             Console.WriteLine();
         }
@@ -530,11 +537,12 @@ namespace dfw.Models
             Console.WriteLine();
             Console.WriteLine("---------游戏菜单-----------");
             Console.WriteLine("1. 玩家行动：");
-            Console.WriteLine("2. 玩家使用机会卡：");
-            Console.WriteLine("3. 抵押艺人或资产：");
-            Console.WriteLine("4. 赎回艺人或资产：");
-            Console.WriteLine("5. 显示卡池信息：");
-            Console.WriteLine("6. 显示玩家信息：");
+            Console.WriteLine("2. 自动游戏：");
+            Console.WriteLine("3. 玩家使用机会卡：");
+            Console.WriteLine("4. 抵押艺人或资产：");
+            Console.WriteLine("5. 赎回艺人或资产：");
+            Console.WriteLine("6. 显示卡池信息：");
+            Console.WriteLine("7. 显示玩家信息：");
             Console.WriteLine("0. 退出游戏菜单：");
             Console.WriteLine("---------等待输入-----------");
             Console.WriteLine();
@@ -557,81 +565,81 @@ namespace dfw.Models
 
         public static void DisplayLog(GameLogs log, Board board)
         {
-            Console.WriteLine($"#####[Round: {log.Round}] | [Player: {log.currentPlayer.Name} {log.currentPlayer.Id}] #####");
+            Console.WriteLine($"[Round: {log.Round}] | [Player: {log.currentPlayer.Name} {log.currentPlayer.Id} : {log.currentPlayer.Gold}]");
             switch(log.Type)
             {
                 case LogEventType.AddPlayer:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] | 添加玩家：{log.PlayerName}, {log.Info}");
+                    Console.WriteLine($"[{log.ID}] | 添加玩家：{log.PlayerName}, {log.Info}");
                     break;
                 case LogEventType.Move:
                     Card card = board.BoardMap[log.EndPoint].PositionCard;
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 移动: from {log.StartPoint} to {log.EndPoint}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 移动: from {log.StartPoint} to {log.EndPoint}");
                     DisplayCard(card);
                     break;
                 case LogEventType.IdolContract:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 签约艺人: {log.CardEvent.Id}，花费 ${log.CardEvent.InitCost}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 签约艺人: {log.CardEvent.Id}，花费 ${log.CardEvent.InitCost}");
                     break;
                 case LogEventType.RoundReward:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 获得初始点奖励 {log.GoldWin}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 获得初始点奖励 {log.GoldWin}");
                     break;
                 case LogEventType.GoldChange:
                     if (log.CpLoss == 0)
                     {
-                        Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 回合支付结算，{log.PayFrom} 向 {log.PayTo} 支付 ${log.GoldLoss}");
+                        Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 回合支付结算，{log.PayFrom} 向 {log.PayTo} 支付 ${log.GoldLoss}");
                     }
                     else
                     {
-                        Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 回合支付结算，{log.PayFrom} 向 {log.PayTo} 支付 ${log.GoldLoss} + CP: ${log.CpLoss}");
+                        Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 回合支付结算，{log.PayFrom} 向 {log.PayTo} 支付 ${log.GoldLoss} + CP: ${log.CpLoss}");
                     }
                     break;
                 case LogEventType.LevelUp:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 对艺人{log.LevelChangePositionNo}进行升级，lv{log.LevelUpFrom} - lv{log.LevelUpTo}，花费${log.CardEvent.LevelUpCost}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 对艺人{log.LevelChangePositionNo}进行升级，lv{log.LevelUpFrom} - lv{log.LevelUpTo}，花费${log.CardEvent.LevelUpCost}");
                     break;
                 case LogEventType.ChanceCardWin:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 获得机会卡 {log.ChanceCardWin}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 获得机会卡 {log.ChanceCardWin}");
                     break;
                 case LogEventType.ChanceCardUse:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 使用机会卡 {log.ChanceCardUse}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 使用机会卡 {log.ChanceCardUse}");
                     break;
                 case LogEventType.ChangeCardTrigger:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 触发命运卡 {log.ChangeCardTrigger}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 触发命运卡 {log.ChangeCardTrigger}");
                     break;
                 case LogEventType.StartGame:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] 游戏开始，欢迎来到 - 杨村大富翁");
+                    Console.WriteLine($"[{log.ID}] 游戏开始，欢迎来到 - 杨村大富翁");
                     break;
                 case LogEventType.PositionFix:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 位置修正 {log.Info}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 位置修正 {log.Info}");
                     break;
                 case LogEventType.PlayerFix:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 信息修正 {log.Info}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 信息修正 {log.Info}");
                     break;
                 case LogEventType.GoldFix:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} 金币修正 {log.Info}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} 金币修正 {log.Info}");
                     break;
                 case LogEventType.LevelFix:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |艺人 {log.LevelChangePositionNo} 等级修正 {log.Info}");
+                    Console.WriteLine($"[{log.ID}] |艺人 {log.LevelChangePositionNo} 等级修正 {log.Info}");
                     break;
                 case LogEventType.IdolOwnerFix:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |艺人 {log.LevelChangePositionNo} 所属经纪人修正 {log.Info}");
+                    Console.WriteLine($"[{log.ID}] |艺人 {log.LevelChangePositionNo} 所属经纪人修正 {log.Info}");
                     break;
 
                 case LogEventType.BackHome:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
                     break;
                 case LogEventType.Holiday:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
                     break;
                 case LogEventType.HolidayEnd:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
                     break;
                 case LogEventType.Education:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
                     break;
                 case LogEventType.Mortgage:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
                     break;
                 case LogEventType.Redeem:
-                    Console.WriteLine($"[{log.TimeStamp} - {log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
+                    Console.WriteLine($"[{log.ID}] |玩家 {log.PlayerName} ：{log.Info}");
                     break;
                 default:
                     break;

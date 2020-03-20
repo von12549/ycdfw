@@ -64,8 +64,17 @@ namespace dfw.Models
                 case "EDU":
                     cardStr = JsonConvert.SerializeObject(Education);
                     break;
-                case "SPEC":
-                    cardStr = JsonConvert.SerializeObject(Special);
+                case "SPEC1":
+                    cardStr = JsonConvert.SerializeObject(Special1);
+                    break;
+                case "SPEC2":
+                    cardStr = JsonConvert.SerializeObject(Special2);
+                    break;
+                case "SPEC3":
+                    cardStr = JsonConvert.SerializeObject(Special3);
+                    break;
+                case "SPEC4":
+                    cardStr = JsonConvert.SerializeObject(Special4);
                     break;
                 case "CHANGE":
                     cardStr = JsonConvert.SerializeObject(Change);
@@ -227,7 +236,7 @@ namespace dfw.Models
         public Card Home = new Card()
         {
             Type = CardType.Home,
-            Name = "起点",
+            Name = "Start",
             Id = 20,
             Info = "每当玩家走完一圈经过起点时，金币+2000"
         };
@@ -235,7 +244,7 @@ namespace dfw.Models
         public Card BackHome = new Card()
         {
             Type = CardType.Back,
-            Name = "回家过年",
+            Name = "Go Home",
             Id = 21,
             Info = "直接回到起点，并获得一张【命运】卡，但不能领取起点奖励。"
         };
@@ -243,7 +252,7 @@ namespace dfw.Models
         public Card Holiday = new Card()
         {
             Type = CardType.Holiday,
-            Name = "出国看秀",
+            Name = "Holiday",
             Id = 22,
             Info = "休息一轮，并可以抽取一张【机会】卡，休息期间无收益，以跳过该玩家掷骰子为结束标志。"
         };
@@ -251,17 +260,49 @@ namespace dfw.Models
         public Card Education = new Card()
         {
             Type = CardType.Education,
-            Name = "进修深造",
+            Name = "Again",
             Id = 23,
             Info = "再玩一次"
         };
 
-        public Card Special = new Card()
+        
+
+        public Card Special1 = new Card()
         {
             Type = CardType.Special,
-            Name = "特殊产业",
+            Name = "Movie",
             Id = 24,
-            Info = "特殊产业",
+            Info = "影视工作室",
+            InitCost = 2000,
+            HolderId = "-1"
+        };
+
+        public Card Special2 = new Card()
+        {
+            Type = CardType.Special,
+            Name = "Publish",
+            Id = 25,
+            Info = "宣发工作室",
+            InitCost = 2000,
+            HolderId = "-1"
+        };
+
+        public Card Special3 = new Card()
+        {
+            Type = CardType.Special,
+            Name = "Music",
+            Id = 26,
+            Info = "音乐工作室",
+            InitCost = 2000,
+            HolderId = "-1"
+        };
+
+        public Card Special4 = new Card()
+        {
+            Type = CardType.Special,
+            Name = "Design",
+            Id = 27,
+            Info = "造型工作室",
             InitCost = 2000,
             HolderId = "-1"
         };
@@ -269,7 +310,7 @@ namespace dfw.Models
         public Card Chance = new Card()
         {
             Type = CardType.Chance,
-            Name = "机会",
+            Name = "Chance",
             Id = 28,
             Info = "抽取一张机会牌，并置于玩家手中。",
         };
@@ -277,7 +318,7 @@ namespace dfw.Models
         public Card Change = new Card()
         {
             Type = CardType.Change,
-            Name = "命运",
+            Name = "Destiny",
             Id = 29,
             Info = "抽取一张命运牌，并强制执行命运牌所公示的内容。",
         };

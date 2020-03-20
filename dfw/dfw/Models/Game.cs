@@ -17,11 +17,15 @@ namespace dfw.Models
         private int Round { get; set; }
         private int PlayerMoved { get; set; }
         private Player currentPlayer { get; set; }
+        private int? MinContract { get; set; }
+        private int? MinLevelUp { get; set; }
+        private string FileName { get; set; }
+        private GameReords Records { get; set; }
         public Game()
         {
             Init();
             GameMainLoop();
-
+            
         }
 
         public void Init()
@@ -33,7 +37,9 @@ namespace dfw.Models
             ChangeUsed = InitChangeUsed();
             ChanceDeck = InitChanceDeck();
             ChanceUsed = InitChanceUsed();
-
+            Records = InitGameRecords();
+            MinContract = null;
+            MinLevelUp = null;
             Round = 0;
             PlayerMoved = 0;
             currentPlayer = new Player() { Id = "-1" };
@@ -59,35 +65,35 @@ namespace dfw.Models
             Position position02 = new Position() { PositionNumber = 2, PositionCard = cardPool.GenerateCard("Idol13") };
             Position position03 = new Position() { PositionNumber = 3, PositionCard = cardPool.GenerateCard("Idol01") };
             Position position04 = new Position() { PositionNumber = 4, PositionCard = cardPool.GenerateCard("Chance") };
-            Position position05 = new Position() { PositionNumber = 5, PositionCard = cardPool.GenerateCard("Idol09") };
-            Position position06 = new Position() { PositionNumber = 6, PositionCard = cardPool.GenerateCard("Idol06") };
-            Position position07 = new Position() { PositionNumber = 7, PositionCard = cardPool.GenerateCard("SPEC") };
-            Position position08 = new Position() { PositionNumber = 8, PositionCard = cardPool.GenerateCard("Idol04") };
-            Position position09 = new Position() { PositionNumber = 9, PositionCard = cardPool.GenerateCard("Idol10") };
+            Position position05 = new Position() { PositionNumber = 5, PositionCard = cardPool.GenerateCard("Idol06") };
+            Position position06 = new Position() { PositionNumber = 6, PositionCard = cardPool.GenerateCard("Idol09") };
+            Position position07 = new Position() { PositionNumber = 7, PositionCard = cardPool.GenerateCard("SPEC1") };
+            Position position08 = new Position() { PositionNumber = 8, PositionCard = cardPool.GenerateCard("Idol10") };
+            Position position09 = new Position() { PositionNumber = 9, PositionCard = cardPool.GenerateCard("Idol04") };
             Position position10 = new Position() { PositionNumber = 10, PositionCard = cardPool.GenerateCard("Change") };
-            Position position11 = new Position() { PositionNumber = 11, PositionCard = cardPool.GenerateCard("BACKHOME") };
-            Position position12 = new Position() { PositionNumber = 12, PositionCard = cardPool.GenerateCard("Idol08") };
-            Position position13 = new Position() { PositionNumber = 13, PositionCard = cardPool.GenerateCard("Idol05") };
-            Position position14 = new Position() { PositionNumber = 14, PositionCard = cardPool.GenerateCard("SPEC") };
+            Position position11 = new Position() { PositionNumber = 11, PositionCard = cardPool.GenerateCard("EDU") };
+            Position position12 = new Position() { PositionNumber = 12, PositionCard = cardPool.GenerateCard("Idol05") };
+            Position position13 = new Position() { PositionNumber = 13, PositionCard = cardPool.GenerateCard("Idol08") };
+            Position position14 = new Position() { PositionNumber = 14, PositionCard = cardPool.GenerateCard("SPEC2") };
             Position position15 = new Position() { PositionNumber = 15, PositionCard = cardPool.GenerateCard("Chance") };
             Position position16 = new Position() { PositionNumber = 16, PositionCard = cardPool.GenerateCard("Idol04") };
             Position position17 = new Position() { PositionNumber = 17, PositionCard = cardPool.GenerateCard("Idol09") };
-            Position position18 = new Position() { PositionNumber = 18, PositionCard = cardPool.GenerateCard("Holiday") };
+            Position position18 = new Position() { PositionNumber = 18, PositionCard = cardPool.GenerateCard("BACKHOME") };
             Position position19 = new Position() { PositionNumber = 19, PositionCard = cardPool.GenerateCard("Idol01") };
             Position position20 = new Position() { PositionNumber = 20, PositionCard = cardPool.GenerateCard("Idol12") };
             Position position21 = new Position() { PositionNumber = 21, PositionCard = cardPool.GenerateCard("Idol02") };
             Position position22 = new Position() { PositionNumber = 22, PositionCard = cardPool.GenerateCard("Change") };
-            Position position23 = new Position() { PositionNumber = 23, PositionCard = cardPool.GenerateCard("SPEC") };
+            Position position23 = new Position() { PositionNumber = 23, PositionCard = cardPool.GenerateCard("SPEC3") };
             Position position24 = new Position() { PositionNumber = 24, PositionCard = cardPool.GenerateCard("Idol03") };
             Position position25 = new Position() { PositionNumber = 25, PositionCard = cardPool.GenerateCard("Idol11") };
             Position position26 = new Position() { PositionNumber = 26, PositionCard = cardPool.GenerateCard("Chance") };
             Position position27 = new Position() { PositionNumber = 27, PositionCard = cardPool.GenerateCard("Idol08") };
             Position position28 = new Position() { PositionNumber = 28, PositionCard = cardPool.GenerateCard("Idol07") };
-            Position position29 = new Position() { PositionNumber = 29, PositionCard = cardPool.GenerateCard("Edu") };
+            Position position29 = new Position() { PositionNumber = 29, PositionCard = cardPool.GenerateCard("HOLIDAY") };
             Position position30 = new Position() { PositionNumber = 30, PositionCard = cardPool.GenerateCard("Change") };
             Position position31 = new Position() { PositionNumber = 31, PositionCard = cardPool.GenerateCard("Idol06") };
             Position position32 = new Position() { PositionNumber = 32, PositionCard = cardPool.GenerateCard("Idol05") };
-            Position position33 = new Position() { PositionNumber = 33, PositionCard = cardPool.GenerateCard("SPEC") };
+            Position position33 = new Position() { PositionNumber = 33, PositionCard = cardPool.GenerateCard("SPEC4") };
             Position position34 = new Position() { PositionNumber = 34, PositionCard = cardPool.GenerateCard("Idol07") };
             Position position35 = new Position() { PositionNumber = 35, PositionCard = cardPool.GenerateCard("Idol03") };
 
@@ -183,6 +189,13 @@ namespace dfw.Models
             return Logs;
 
         }
+
+        private GameReords InitGameRecords()
+        {
+            FileName = GameReords.GenerateFileName();
+            GameReords record = new GameReords(FileName);
+            return record;
+        }
         #endregion
         #region Assist Check Function
         private bool NumberCheck(string str)
@@ -211,6 +224,7 @@ namespace dfw.Models
         {
             Logs.Add(log);
             Display.DisplayLog(log, GameBoard);
+            Records.RecordLog(log, GameBoard);
             return Logs;
         }
 
@@ -261,8 +275,24 @@ namespace dfw.Models
             }
             return false;
         }
+
+
         #endregion
 
+        #region 游戏结束
+        private void EndGame()
+        {
+            Records.AppendRecordsLine("###\t 游戏结束 \t###");
+            Records.AppendRecordsLine("###\t 棋盘信息 \t###");
+            Records.RecordBoard(GameBoard, Players);
+            Records.AppendRecordsLine("###\t 玩家信息 \t###");
+            foreach (var p in Players)
+            {
+                Records.RecordPlayer(p, GameBoard);
+            }
+        }
+
+        #endregion
 
     }
 }

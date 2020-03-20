@@ -27,9 +27,16 @@ namespace dfw.Models
             return true;
         }
 
-        private bool Move(bool moveNext = true)
+        private bool Move(bool moveNext = true, bool autoRun = false)
         {
-
+            if (PlayerMoved == 0)
+            {
+                currentPlayer = Players[0];
+            }
+            else
+            {
+                currentPlayer = Players[PlayerMoved % Players.Count];
+            }
             var player = currentPlayer;
             Console.WriteLine($"玩家 {player.Name} 回合: ");
             if (player.Stop == true)
@@ -37,12 +44,20 @@ namespace dfw.Models
                 return HolidayEnd(player);
             }
             int dice = -1;
-            while(dice > 6 || dice < 1)
+            if (autoRun == true)
             {
-                Console.WriteLine("请输入玩家移动的距离：(1-6)/(Exit 退出)");
-                bool notExit = ReadIntNumber(out dice);
-                if (!notExit)
-                    return false;
+                Random rnd = new Random(Guid.NewGuid().GetHashCode());
+                dice = rnd.Next(1, 7);
+            }
+            else
+            {
+                while (dice > 6 || dice < 1)
+                {
+                    Console.WriteLine("请输入玩家移动的距离：(1-6)/(Exit 退出)");
+                    bool notExit = ReadIntNumber(out dice);
+                    if (!notExit)
+                        return false;
+                }
             }
 
             if (player == null)
@@ -102,70 +117,84 @@ namespace dfw.Models
                 {
                     if (positionCard.Level < 4)
                     {
-                        bool loop = true;
-                        while (loop)
+                        if (!autoRun)
                         {
-                            Console.WriteLine("是否进行艺人升级？（Y/n）");
-                            string YesOrNo = Console.ReadLine();
-                            switch (YesOrNo.Trim().ToUpper())
+                            bool loop = true;
+                            while (loop)
                             {
-                                case "":
-                                    IdolLevelUp(player);
-                                    loop = false;
-                                    break;
-                                case "Y":
-                                    IdolLevelUp(player);
-                                    loop = false;
-                                    break;
-                                case "YES":
-                                    IdolLevelUp(player);
-                                    loop = false;
-                                    break;
-                                case "N":
-                                    Console.WriteLine("不进行升级。");
-                                    loop = false;
-                                    break;
-                                case "NO":
-                                    Console.WriteLine("不进行升级。");
-                                    loop = false;
-                                    break;
+                                Console.WriteLine("是否进行艺人升级？（Y/n）");
+                                string YesOrNo = Console.ReadLine();
+                                switch (YesOrNo.Trim().ToUpper())
+                                {
+                                    case "":
+                                        IdolLevelUp(player);
+                                        loop = false;
+                                        break;
+                                    case "Y":
+                                        IdolLevelUp(player);
+                                        loop = false;
+                                        break;
+                                    case "YES":
+                                        IdolLevelUp(player);
+                                        loop = false;
+                                        break;
+                                    case "N":
+                                        Console.WriteLine("不进行升级。");
+                                        loop = false;
+                                        break;
+                                    case "NO":
+                                        Console.WriteLine("不进行升级。");
+                                        loop = false;
+                                        break;
+                                }
                             }
+                        }
+                        else
+                        {
+                            IdolLevelUp(player);
                         }
                     }
                 }
                 else if (string.Equals(positionCard.HolderId, "-1"))
                 {
-                    bool loop = true;
-                    while (loop)
+                    if (!autoRun)
                     {
-                        Console.WriteLine("该艺人没有所属公司，是否签约艺人？（Y/n）");
-                        string YesOrNo = Console.ReadLine();
-
-                        switch (YesOrNo.Trim().ToUpper())
+                        bool loop = true;
+                        while (loop)
                         {
-                            case "":
-                                IdolContract(player);
-                                loop = false;
-                                break;
-                            case "Y":
-                                IdolContract(player);
-                                loop = false;
-                                break;
-                            case "YES":
-                                IdolContract(player);
-                                loop = false;
-                                break;
-                            case "N":
-                                Console.WriteLine("不进行签约。");
-                                loop = false;
-                                break;
-                            case "NO":
-                                Console.WriteLine("不进行签约。");
-                                loop = false;
-                                break;
-                            default:
-                                break;
+                            Console.WriteLine("该艺人没有所属公司，是否签约艺人？（Y/n）");
+                            string YesOrNo = Console.ReadLine();
+
+                            switch (YesOrNo.Trim().ToUpper())
+                            {
+                                case "":
+                                    IdolContract(player);
+                                    loop = false;
+                                    break;
+                                case "Y":
+                                    IdolContract(player);
+                                    loop = false;
+                                    break;
+                                case "YES":
+                                    IdolContract(player);
+                                    loop = false;
+                                    break;
+                                case "N":
+                                    Console.WriteLine("不进行签约。");
+                                    loop = false;
+                                    break;
+                                case "NO":
+                                    Console.WriteLine("不进行签约。");
+                                    loop = false;
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
+                    }
+                    else
+                    {
+                        IdolContract(player);
                     }
                 }
             }
@@ -205,43 +234,50 @@ namespace dfw.Models
                         }
                         if (positionCard.isMortgage == true)
                         {
-                            Console.WriteLine($"艺人{player.PositionNumber}:{positionCard.Name} 处于抵押状态，无法获得收入。");
+                            Console.WriteLine($"产业{player.PositionNumber}:{positionCard.Name} 处于抵押状态，无法获得收入。");
                         }
                     }
                 }
                 else if (string.Equals(positionCard.HolderId, "-1"))
                 {
-                    bool loop = true;
-                    while (loop)
+                    if (!autoRun)
                     {
-                        Console.WriteLine("该产业没有所属公司，是否买下产业？（Y/n）");
-                        string YesOrNo = Console.ReadLine();
-
-                        switch (YesOrNo.Trim().ToUpper())
+                        bool loop = true;
+                        while (loop)
                         {
-                            case "":
-                                IdolContract(player);
-                                loop = false;
-                                break;
-                            case "Y":
-                                IdolContract(player);
-                                loop = false;
-                                break;
-                            case "YES":
-                                IdolContract(player);
-                                loop = false;
-                                break;
-                            case "N":
-                                Console.WriteLine("不进行签约。");
-                                loop = false;
-                                break;
-                            case "NO":
-                                Console.WriteLine("不进行签约。");
-                                loop = false;
-                                break;
-                            default:
-                                break;
+                            Console.WriteLine("该产业没有所属公司，是否买下产业？（Y/n）");
+                            string YesOrNo = Console.ReadLine();
+
+                            switch (YesOrNo.Trim().ToUpper())
+                            {
+                                case "":
+                                    IdolContract(player);
+                                    loop = false;
+                                    break;
+                                case "Y":
+                                    IdolContract(player);
+                                    loop = false;
+                                    break;
+                                case "YES":
+                                    IdolContract(player);
+                                    loop = false;
+                                    break;
+                                case "N":
+                                    Console.WriteLine("不进行签约。");
+                                    loop = false;
+                                    break;
+                                case "NO":
+                                    Console.WriteLine("不进行签约。");
+                                    loop = false;
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
+                    }
+                    else
+                    {
+                        IdolContract(player);
                     }
                 }
             }
@@ -265,7 +301,7 @@ namespace dfw.Models
                     currentPlayer = currentPlayer
                 };
                 AddLog(eduLog);
-                Move(false);
+                Move(false, autoRun);
             }
             else if (positionCard.Type == CardType.Chance)
             {
@@ -344,7 +380,12 @@ namespace dfw.Models
             }
             if (player.Gold < GameBoard.BoardMap[position].PositionCard.InitCost)
             {
-                Console.WriteLine("玩家现金不够，无法购买该艺人。");
+                Console.WriteLine("玩家现金不够，无法购买该艺人或特殊产业。");
+                return false;
+            }
+            if(MinContract != null && player.Gold < MinContract)
+            {
+                Console.WriteLine($"玩家现金低于 ${MinContract}，无法购买该艺人或特殊产业。");
                 return false;
             }
             GameBoard.BoardMap[position].PositionCard.HolderId = player.Id;
@@ -405,6 +446,11 @@ namespace dfw.Models
             if (player.Gold < GameBoard.BoardMap[position].PositionCard.LevelUpCost)
             {
                 Console.WriteLine("玩家现金不够，无法升级该艺人。");
+                return false;
+            }
+            if(MinLevelUp != null && player.Gold < MinLevelUp)
+            {
+                Console.WriteLine($"玩家现金低于 ${MinContract}，无法购买该艺人或特殊产业。");
                 return false;
             }
 
